@@ -316,7 +316,8 @@ def admin():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    port = int(os.getenv('PORT', 8000))  # Usar el puerto asignado por Railway o 8000 si no está disponible
+    app.run(debug=True, host='0.0.0.0', port=port)
 
 # # app.py
 # from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
