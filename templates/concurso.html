@@ -1,0 +1,266 @@
+<!-- templates/concurso.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Equipo - {{ grupo.nombre }} 💪</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <style>
+        body {
+            background-color: #f5f5f5;
+            padding-top: 30px;
+        }
+        .container {
+            max-width: 1000px;
+        }
+        .respuestas-card, .posiciones-card {
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .btn-respuesta {
+            margin: 10px;
+            height: 100px;
+            font-size: 1.2rem;
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+        .btn-respuesta:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .btn-respuesta.correcta {
+            background-color: #28a745;
+            color: white;
+        }
+        .score {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        header {
+            max-width: 100%;
+            height: 10rem;
+            display: block;
+            margin: 0 auto;
+        }
+
+        h1 {
+           
+            text-align: center;
+            background: #f12711;  /* Fallback para navegadores antiguos */
+            background: -webkit-linear-gradient(to right, #f5af19, #f12711);  /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to right, #f5af19, #f12711);  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            
+            -webkit-background-clip: text;  /* Chrome, Safari, Opera */
+            -moz-background-clip: text;     /* Firefox */
+            background-clip: text;          /* Estándar W3C */
+
+            color: transparent;  
+
+        }
+    </style> -->
+</head>
+<body>
+    <header>
+        <h1>El Guardián Digital</h1>
+    </header>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>Equipo: <span class="text-primary">{{ grupo.nombre }}</span></h3>
+            <div class="score">
+                Puntos: <span id="puntaje">{{ grupo.puntos }}</span>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card respuestas-card p-4">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">Respuestas</h2>
+                        <div class="d-flex flex-wrap justify-content-center">
+                            {% for i in range(1, 6) %}
+                                <button 
+                                    id="btn-respuesta-{{ i }}" 
+                                    class="btn btn-lg {% if respuestas_correctas[i] %}btn-success correcta{% else %}btn-primary{% endif %} btn-respuesta" 
+                                    {% if respuestas_correctas[i] %}disabled{% endif %}
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#respuestaModal" 
+                                    data-pregunta="{{ i }}">
+                                    Ingresa clave {{ i }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-5">
+                <div class="card posiciones-card p-4">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">Tabla de Posiciones</h2>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="tabla-posiciones">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Equipo</th>
+                                        <th>Puntos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for g in tabla_posiciones %}
+                                    <tr {% if g.id == grupo.id %}class="table-primary"{% endif %}>
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ g.nombre }}</td>
+                                        <td>{{ g.puntos }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para ingresar respuesta -->
+    <div class="modal fade" id="respuestaModal" tabindex="-1" aria-labelledby="respuestaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="respuestaModalLabel">Ingresa tu respuesta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-respuesta">
+                        <input type="hidden" id="pregunta_id" name="pregunta_id">
+                        <div class="mb-3">
+                            <label for="respuesta" class="form-label">Clave</label>
+                            <input type="text" class="form-control" id="respuesta" name="respuesta" required>
+                        </div>
+                        <div id="respuesta-feedback" class="alert d-none"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="btn-enviar-respuesta">Enviar respuesta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Configurar el modal
+        const respuestaModal = document.getElementById('respuestaModal');
+        const botonesRespuesta = document.querySelectorAll('.btn-respuesta');
+        const preguntaIdInput = document.getElementById('pregunta_id');
+        const respuestaInput = document.getElementById('respuesta');
+        const respuestaFeedback = document.getElementById('respuesta-feedback');
+        const btnEnviarRespuesta = document.getElementById('btn-enviar-respuesta');
+        const puntajeElement = document.getElementById('puntaje');
+        
+        // Preparar modal cuando se abre
+        botonesRespuesta.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const preguntaId = this.getAttribute('data-pregunta');
+                preguntaIdInput.value = preguntaId;
+                respuestaInput.value = '';
+                respuestaFeedback.classList.add('d-none');
+                respuestaInput.focus();
+            });
+        });
+        
+        // Enviar respuesta
+        btnEnviarRespuesta.addEventListener('click', function() {
+            const formData = new FormData();
+            formData.append('pregunta_id', preguntaIdInput.value);
+            formData.append('respuesta', respuestaInput.value);
+            
+            fetch('/responder', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                respuestaFeedback.classList.remove('d-none', 'alert-success', 'alert-danger');
+                
+                if (data.success) {
+                    respuestaFeedback.classList.add('alert-success');
+                    respuestaFeedback.textContent = data.message;
+                    
+                    // Actualizar puntaje
+                    const puntajeActual = parseInt(puntajeElement.textContent);
+                    puntajeElement.textContent = puntajeActual + data.puntos;
+                    
+                    // Marcar botón como correcto
+                    const btnRespuesta = document.getElementById(`btn-respuesta-${preguntaIdInput.value}`);
+                    btnRespuesta.classList.add('btn-success', 'correcta');
+                    btnRespuesta.classList.remove('btn-primary');
+                    btnRespuesta.disabled = true;
+                    
+                    // Actualizar tabla de posiciones después de 1 segundo
+                    setTimeout(actualizarPosiciones, 1000);
+                    
+                    // Cerrar modal después de 2 segundos
+                    setTimeout(() => {
+                        const modalInstance = bootstrap.Modal.getInstance(respuestaModal);
+                        modalInstance.hide();
+                    }, 8000);
+                } else {
+                    respuestaFeedback.classList.add('alert-danger');
+                    respuestaFeedback.textContent = data.message;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                respuestaFeedback.classList.remove('d-none');
+                respuestaFeedback.classList.add('alert-danger');
+                respuestaFeedback.textContent = 'Error al procesar la respuesta. Inténtalo nuevamente.';
+            });
+        });
+        
+        // Permitir enviar con Enter
+        respuestaInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                btnEnviarRespuesta.click();
+            }
+        });
+        
+        // Función para actualizar la tabla de posiciones
+        function actualizarPosiciones() {
+            fetch('/posiciones')
+            .then(response => response.json())
+            .then(data => {
+                const tablaBody = document.querySelector('#tabla-posiciones tbody');
+                tablaBody.innerHTML = '';
+                
+                data.posiciones.forEach((grupo, index) => {
+                    const row = document.createElement('tr');
+                    
+                    // Verificar si es el grupo actual del usuario
+                    if (grupo.nombre === '{{ grupo.nombre }}') {
+                        row.classList.add('table-primary');
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${grupo.nombre}</td>
+                        <td>${grupo.puntos}</td>
+                    `;
+                    
+                    tablaBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+        // Actualizar posiciones cada 10 segundos
+        setInterval(actualizarPosiciones, 10000);
+    </script>
+</body>
+</html>

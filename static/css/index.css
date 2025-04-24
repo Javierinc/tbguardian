@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+    background-color: #f9fafb; /* Color de fondo neutro */
+    padding-top: 30px;
+    font-family: 'Inter', sans-serif;
+    color: #1a1a1a;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Tarjeta de registro con efecto glassmorphism */
+.registro-card {
+    margin-top: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.15); /* Efecto de vidrio */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1.5rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.registro-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo centrado y con tamaño adaptable */
+.logo {
+    max-width: 180px;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Botones con diseño de shadcn */
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    border: none;
+    background: #1a1a1a;
+    color: white;
+}
+
+.btn:hover {
+    background: #333;
+    transform: translateY(-2px);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .registro-card {
+        padding: 1rem;
+    }
+}
+ 
+@media (min-width: 1024px) { 
+    .registro-card {
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}

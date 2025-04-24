@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergencia 🚨</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sistema.css') }}">
+</head>
+<body>
+    <video autoplay muted loop playsinline class="video-background">
+        <source src="{{ url_for('static', filename='video3.mp4') }}" type="video/mp4">
+        Tu navegador no soporta el elemento de video.
+    </video>  
+    <div class="container">
+        <!-- <h1>Estado de Emergencia en CCHC 🚨</h1> -->
+        <h1>
+            Estado de Emergencia en 
+            <span class="logo-container">
+                <img src="{{ url_for('static', filename='images/cchc-logo.png') }}" alt="CCHC Logo">
+            </span>
+        </h1>
+        
+        <h2>Los siguientes sistemas de seguridad han sido secuestrados</h2>
+       
+        <table border="1" id="tabla-sistemas">
+            <!-- <tr>
+                <th>Sistema</th>
+                <th>Estado</th>
+            </tr> -->
+            {% for sistema in sistemas %}
+            <tr>
+                <td>{{ sistema.nombre }}</td>
+                <td>{{ sistema.estado }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <!-- <a href="{{ url_for('index') }}">Volver al inicio</a> -->
+    </div>
+    <script>
+                // Función para actualizar la tabla de posiciones     
+                
+        function actualizarPosiciones() {
+            fetch('/sistemas')
+            .then(response => response.json())
+            .then(data => {
+                const tablaBody = document.querySelector('#tabla-sistemas');
+                tablaBody.innerHTML = '';
+                
+                data.sistemas.forEach((sistema, index) => {
+                    const row = document.createElement('tr');
+                    console.log(sistema.nombre)
+                    // Verificar si es el grupo actual del usuario
+                    
+                    
+                    row.innerHTML = `
+                        <td>${sistema.nombre}</td>
+                        <td>${sistema.estado}</td>
+                    `;
+                    
+                    tablaBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+        // Actualizar posiciones cada 10 segundos
+        setInterval(actualizarPosiciones, 10000);
+    </script>
+</body>
+</html>

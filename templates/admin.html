@@ -1,0 +1,175 @@
+<!-- <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gestión de Equipos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Panel de Administración</h1>
+
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h2>Agregar equipo</h2>
+        <form method="POST">
+            <input type="hidden" name="action" value="add_team">
+            <input type="text" name="nombre_grupo" placeholder="Nombre del equipo" required>
+            <button type="submit">Agregar</button>
+        </form>
+
+        <h2>Equipos Registrados</h2>
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Puntos</th>
+                <th>Acciones</th>
+            </tr>
+            {% for grupo in grupos %}
+            <tr>
+                <td>{{ grupo.id }}</td>
+                <td>{{ grupo.nombre }}</td>
+                <td>{{ grupo.puntos }}</td>
+                <td>
+    
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="action" value="update_score">
+                        <input type="hidden" name="grupo_id" value="{{ grupo.id }}">
+                        <input type="number" name="nuevo_puntaje" value="{{ grupo.puntos }}" required>
+                        <button type="submit">Actualizar</button>
+                    </form>
+
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="action" value="delete_team">
+                        <input type="hidden" name="grupo_id" value="{{ grupo.id }}">
+                        <button type="submit" onclick="return confirm('¿Seguro que deseas eliminar este equipo?')">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <a href="{{ url_for('index') }}">Volver al inicio</a>
+    </div>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración 😬</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Panel de Administración</h1>
+
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Agregar equipo -->
+        <h2>Agregar equipo</h2>
+        <form method="POST">
+            <input type="hidden" name="action" value="add_team">
+            <input type="text" name="nombre_grupo" placeholder="Nombre del equipo" required>
+            <button type="submit">Agregar</button>
+        </form>
+
+        <!-- Lista de equipos -->
+        <h2>Equipos Registrados</h2>
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Puntos</th>
+                <th>Acciones</th>
+            </tr>
+            {% for grupo in grupos %}
+            <tr>
+                <td>{{ grupo.id }}</td>
+                <td>{{ grupo.nombre }}</td>
+                <td>{{ grupo.puntos }}</td>
+                <td>
+                    <!-- Modificar puntos -->
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="action" value="update_score">
+                        <input type="hidden" name="grupo_id" value="{{ grupo.id }}">
+                        <input type="number" name="nuevo_puntaje" value="{{ grupo.puntos }}" required>
+                        <button type="submit">Actualizar</button>
+                    </form>
+
+                    <!-- Eliminar equipo -->
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="action" value="delete_team">
+                        <input type="hidden" name="grupo_id" value="{{ grupo.id }}">
+                        <button type="submit" onclick="return confirm('¿Seguro que deseas eliminar este equipo?')">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <!-- Agregar sistema secuestrado -->
+        <h2>Agregar Sistema Secuestrado</h2>
+        <form method="POST">
+            <input type="hidden" name="action" value="add_system">
+            <input type="text" name="nombre_sistema" placeholder="Nombre del sistema" required>
+            <button type="submit">Agregar</button>
+        </form>
+
+        <!-- Lista de sistemas secuestrados -->
+        <h2>Sistemas Secuestrados</h2>
+        <table border="1" id="tabla-sistemas">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            {% for sistema in sistemas %}
+            <tr>
+                <td>{{ sistema.id }}</td>
+                <td>{{ sistema.nombre }}</td>
+                <td>{{ sistema.estado }}</td>
+                <td>
+                    <!-- Modificar estado -->
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="action" value="update_system">
+                        <input type="hidden" name="sistema_id" value="{{ sistema.id }}">
+                        <select name="nuevo_estado">
+                            <option value="Secuestrado" {% if sistema.estado == 'Secuestrado' %}selected{% endif %}>Secuestrado</option>
+                            <option value="Control Humano" {% if sistema.estado == 'Control Humano' %}selected{% endif %}>Control Humano</option>
+                        </select>
+                        <button type="submit">Actualizar</button>
+                    </form>
+
+                    <!-- Eliminar sistema -->
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="action" value="delete_system">
+                        <input type="hidden" name="sistema_id" value="{{ sistema.id }}">
+                        <button type="submit" onclick="return confirm('¿Seguro que deseas eliminar este sistema?')">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <a href="{{ url_for('index') }}">Volver al inicio</a>
+    </div>
+</body>
+</html>
